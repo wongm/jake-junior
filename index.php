@@ -145,10 +145,9 @@ function drawHome()
 function drawAbout()
 {
 ?>
-<p>I built this page because the full version of TramTracker <a href="http://wongm.com/2013/12/yarra-trams-tramtracker-website-broken/">doesn't work on ancient mobile phones</a>.</p>
-<p>In the backend the same TramTracker API is used, but the data is presented in a lightweight way.</p>
-<p>You can find the PHP source code at <a href="https://github.com/wongm/jake-junior">https://github.com/wongm/jake-junior</a></p>
-<p>Created by Marcus Wong (<a href="http://wongm.com/">http://wongm.com/</a>)</p>
+<p>Created by Marcus Wong (<a href="http://wongm.com/">http://wongm.com/</a>) because the full version of TramTracker <a href="http://wongm.com/2013/12/yarra-trams-tramtracker-website-broken/">doesn't work on ancient mobile phones</a>.</p>
+<p>In the backend the same TramTracker API is used, but the data is presented in a lightweight way. You can find the PHP source code at <a href="https://github.com/wongm/jake-junior">https://github.com/wongm/jake-junior</a>.</p>
+<p>The favicon is a <a href="https://commons.wikimedia.org/wiki/File:BSicon_TRAM.svg">public domain image by Seo75</a>.</p>
 <a href="/">Return</a>
 <?php
 }

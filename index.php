@@ -124,6 +124,7 @@ function drawStopData($stopid, $routeid)
 	
 ?>
 </ul>
+<p>Retrieved <?php echo date('j M Y g:i:s A', $timestamp) ?></p>
 <a href="/">Return</a>
 <?php
 }

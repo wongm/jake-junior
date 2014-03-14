@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head><title>Static Jake</title></head>
+<head><title>Jake Junior</title></head>
 <body>
-<strong>Static Jake: TramTracker made simple</strong>
+<strong>Jake Junior: TramTracker made simple</strong>
 <?php
 
 $stopid = $_REQUEST['id'];
@@ -119,7 +119,7 @@ function drawStopData($stopid, $routeid)
 	
 ?>
 </ul>
-<a href="?">Return</a>
+<a href="/">Return</a>
 <?php
 }
 
@@ -127,7 +127,7 @@ function drawErrorLink($troublesome)
 {
 ?>
 <p>Invalid <?php echo $troublesome ?> given!</p>
-<a href="?">Return</a>
+<a href="/">Return</a>
 <?php
 }
 
@@ -145,10 +145,11 @@ function drawHome()
 function drawAbout()
 {
 ?>
-<p>The full version of TramTracker <a href="http://wongm.com/2013/12/yarra-trams-tramtracker-website-broken/">doesn't work on ancient mobile phones</a>.</p>
-<p>This website uses the same TramTracker API, and presents the data in a lightweight way.</p>
+<p>I built this page because the full version of TramTracker <a href="http://wongm.com/2013/12/yarra-trams-tramtracker-website-broken/">doesn't work on ancient mobile phones</a>.</p>
+<p>In the backend the same TramTracker API is used, but the data is presented in a lightweight way.</p>
+<p>You can find the PHP source code at <a href="https://github.com/wongm/jake-junior">https://github.com/wongm/jake-junior</a></p>
 <p>Created by Marcus Wong (<a href="http://wongm.com/">http://wongm.com/</a>)</p>
-<a href="?">Return</a>
+<a href="/">Return</a>
 <?php
 }
 ?>

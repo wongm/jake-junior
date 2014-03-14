@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head><title>Jake Junior</title></head>
+<head>
+<title>Jake Junior</title>
+<meta name="description" property="og:description" content="TramTracker for Dumbphones" />
+<meta property="og:title" content="Jake Junior" />
+<meta property="og:image" content="http://jakejunior.wongm.com/largetile.png" />
+</head>
 <body>
-<strong>Jake Junior: TramTracker made simple</strong>
+<strong>Jake Junior: TramTracker for Dumbphones</strong>
 <?php
 
 $stopid = $_REQUEST['id'];

@@ -140,10 +140,11 @@ function drawErrorLink($troublesome)
 function drawHome()
 {
 ?>
-<form action="" method="get">
+<form action="/" method="get">
 <label for="id">TramTracker ID</label>
-<input id="id" name="id" maxlength="4" size="4" />
-<button type="submit">Go</button></br>
+<input type="number" id="id" name="id" maxlength="4" size="4" />
+<input type="submit" value="Go" /></br>
+</form>
 <a href="?about">About</a>
 <?php
 }

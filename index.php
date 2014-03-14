@@ -17,8 +17,7 @@ else if (isset($_REQUEST['id']))
 {
 	if (!is_numeric($stopid))
 	{
-		echo '<p>Invalid stop ID given!</p>';
-		drawReturnLink();
+		drawErrorLink('stop ID');
 	}
 	else
 	{
@@ -28,8 +27,7 @@ else if (isset($_REQUEST['id']))
 		}
 		if (!is_numeric($routeid))
 		{
-			echo '<p>Invalid route number given!</p>';
-			drawReturnLink();
+			drawErrorLink('route number');
 		}
 		else
 		{
@@ -47,16 +45,34 @@ function drawStopData($stopid, $routeid)
 	$timestamp = time();
 	$nexttrams = array();
 	
-	$timesurl = "http://www.tramtracker.com/Controllers/GetNextPredictionsForStop.ashx?stopNo=$stopid&routeNo=$routeid&isLowFloor=false&ts=$timestamp";
-	$timesjson = file_get_contents($timesurl);
-	$timesresults = json_decode($timesjson)->responseObject;
-	
 	$infourl = "http://tramtracker.com/Controllers/GetStopInformation.ashx?s=$stopid";
 	$infojson = file_get_contents($infourl);
-	$inforesults = json_decode($infojson)->ResponseObject;
-
+	$inforesults = json_decode($infojson);
+	
+	if ($inforesults->HasError)
+	{
+		drawErrorLink('stop ID');
+		return;
+	}
+	
+	$timesurl = "http://www.tramtracker.com/Controllers/GetNextPredictionsForStop.ashx?stopNo=$stopid&routeNo=$routeid&isLowFloor=false&ts=$timestamp";
+	$timesjson = file_get_contents($timesurl);
+	$timesresults = json_decode($timesjson);
+	
+	if ($timesresults->hasError)
+	{
+		drawErrorLink('stop ID');
+		return;
+	}
+	
+	if ($timesresults->responseObject == null)
+	{
+		drawErrorLink('stop ID and route number combination');
+		return;
+	}
+	
 ?>
-<p>Stop <?php echo $inforesults->FlagStopNo; ?>: <?php echo $inforesults->StopName; ?>, <?php echo $inforesults->CityDirection; ?></p>
+<p>Stop <?php echo $inforesults->ResponseObject->FlagStopNo; ?>: <?php echo $inforesults->ResponseObject->StopName; ?>, <?php echo $inforesults->ResponseObject->CityDirection; ?></p>
 <ul>
 <?php
 
@@ -64,7 +80,7 @@ function drawStopData($stopid, $routeid)
 	$includelinks = false;
 	$lastroute = -1;
 
-	foreach($timesresults as $tramservice)
+	foreach($timesresults->responseObject as $tramservice)
 	{
 		// parse out the timestamp part
 		preg_match('/(\d{10})(\d{3})([\+\-]\d{4})/', $tramservice->PredictedArrivalDateTime, $matches);
@@ -107,9 +123,10 @@ function drawStopData($stopid, $routeid)
 <?php
 }
 
-function drawReturnLink()
+function drawErrorLink($troublesome)
 {
 ?>
+<p>Invalid <?php echo $troublesome ?> given!</p>
 <a href="?">Return</a>
 <?php
 }

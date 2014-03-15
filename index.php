@@ -87,7 +87,7 @@ function drawStopData($stopid, $routeid)
 
 	foreach($timesresults->responseObject as $tramservice)
 	{
-		// parse out the timestamp part
+		// Parse out the timestamp part
 		preg_match('/(\d{10})(\d{3})([\+\-]\d{4})/', $tramservice->PredictedArrivalDateTime, $matches);
 		// Get the timestamp as the TS tring / 1000
 		$predicted = (int) $matches[1];
@@ -95,18 +95,28 @@ function drawStopData($stopid, $routeid)
 		// Convert to minutes, and round down
 		$minutesuntil = floor(($predicted - $timestamp) / 60);
 		
+		// Format differently if a long wait
+		if ($minutesuntil > 59)
+		{
+			$minutesmessage = date('g:ia', $predicted);
+		}
+		else
+		{
+			$minutesmessage = "$minutesuntil minutes";
+		}
+		
 		// Keep track of different routes
 		$serviceroute = $tramservice->HeadBoardRouteNo;
 		$newroute = ($lastroute != $serviceroute);
 		
-		// only want links for more than on route
+		// We only want links when more than one route passes this stop
 		if ($newroute && $lastroute > 0)
 		{
 			$includelinks = true;
 		}
 		$lastroute = $serviceroute;
 		
-		array_push($servicesdata, array('newroute' => $newroute, 'serviceroute' => $serviceroute , 'minutesuntil' => $minutesuntil ));
+		array_push($servicesdata, array('newroute' => $newroute, 'serviceroute' => $serviceroute , 'minutesmessage' => $minutesmessage ));
 	}
 	
 	foreach($servicesdata as $tramservice)
@@ -117,7 +127,7 @@ function drawStopData($stopid, $routeid)
 			$routetitle = "<a href=\"?id=" . $stopid . "&route=" . $tramservice['serviceroute'] . "\">$routetitle</a>";
 		}
 ?>
-<li><?php echo $routetitle ?>: <?php echo $tramservice['minutesuntil'] ?> minutes</li>
+<li><?php echo $routetitle ?>: <?php echo $tramservice['minutesmessage'] ?></li>
 <?php
 
 	}

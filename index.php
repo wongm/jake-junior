@@ -49,6 +49,7 @@ function drawStopData($stopid, $routeid)
 {
 	$timestamp = time();
 	$nexttrams = array();
+	$melbournetimezone = new DateTimeZone('Australia/Melbourne');
 	
 	$infourl = "http://tramtracker.com/Controllers/GetStopInformation.ashx?s=$stopid";
 	$infojson = file_get_contents($infourl);
@@ -98,7 +99,10 @@ function drawStopData($stopid, $routeid)
 		// Format differently if a long wait
 		if ($minutesuntil > 59)
 		{
-			$minutesmessage = date('g:ia', $predicted);
+			$formattedprediction = new DateTime();
+			$formattedprediction->setTimestamp($predicted);
+			$formattedprediction->setTimezone($melbournetimezone);
+			$minutesmessage = $formattedprediction->format('g:i a');
 		}
 		else
 		{
@@ -132,9 +136,14 @@ function drawStopData($stopid, $routeid)
 
 	}
 	
+	$formattedtimestamp = new DateTime();
+	$formattedtimestamp->setTimestamp($timestamp);
+	$formattedtimestamp->setTimezone($melbournetimezone);
+	$timestampmessage = $formattedtimestamp->format('j M Y g:i:s a');
+	
 ?>
 </ul>
-<p>Retrieved <?php echo date('j M Y g:i:s A', $timestamp) ?></p>
+<p>Retrieved <?php echo $timestampmessage ?></p>
 <a href="/">Return</a>
 <?php
 }

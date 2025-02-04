@@ -47,12 +47,22 @@ else
 
 function drawStopData($stopid, $routeid)
 {
+	global $proxyUrl;
+	
 	$timestamp = time();
 	$nexttrams = array();
 	$melbournetimezone = new DateTimeZone('Australia/Melbourne');
 	
-	$infourl = "http://tramtracker.com/Controllers/GetStopInformation.ashx?s=$stopid";
-	$infojson = file_get_contents($infourl);
+	$infourl = $proxyUrl . "https://tramtracker.com.au/Controllers/GetStopInformation.ashx?s=$stopid";
+	$infoRequest = curl_init($infourl);
+	curl_setopt($infoRequest, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($infoRequest, CURLOPT_HEADER, 0);
+	curl_setopt($infoRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+	curl_setopt($infoRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
+
+	$infojson = curl_exec($infoRequest);
+	curl_close($infoRequest);
+	
 	$inforesults = json_decode($infojson);
 	
 	if ($inforesults->HasError)
@@ -61,8 +71,45 @@ function drawStopData($stopid, $routeid)
 		return;
 	}
 	
-	$timesurl = "http://www.tramtracker.com/Controllers/GetNextPredictionsForStop.ashx?stopNo=$stopid&routeNo=$routeid&isLowFloor=false&ts=$timestamp";
-	$timesjson = file_get_contents($timesurl);
+	if ($routeid == 0)
+	{
+		// get list of routes passing
+		$routesurl = $proxyUrl . "https://tramtracker.com.au/Controllers/GetPassingRoutes.ashx?s=$stopid";
+		$routesRequest = curl_init($routesurl);
+		curl_setopt($routesRequest, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($routesRequest, CURLOPT_HEADER, 0);
+		curl_setopt($routesRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+		curl_setopt($routesRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
+
+		$routesjson = curl_exec($routesRequest);
+		curl_close($routesRequest);	
+		
+		$routesresults = json_decode($routesjson);	
+		
+		if (sizeof($routesresults->ResponseObject) == 1)
+		{
+			$routeid = $routesresults->ResponseObject[0]->RouteNo;
+		}
+		else
+		{
+			foreach ($routesresults->ResponseObject as $routesresult)
+			{
+				echo "<p><a href=\"?id=" . $stopid . "&route=" . $routesresult->RouteNo . "\">Route " . $routesresult->RouteNo . "</a></p>";
+			}
+			return;
+		}
+	}
+	$timesurl = $proxyUrl . "https://tramtracker.com.au/Controllers/GetNextPredictionsForStop.ashx?stopNo=$stopid%26routeNo=$routeid%26isLowFloor=false%26ts=$timestamp";
+	
+	$timesRequest = curl_init($timesurl);
+	curl_setopt($timesRequest, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($timesRequest, CURLOPT_HEADER, 0);
+	curl_setopt($timesRequest, CURLOPT_CONNECTTIMEOUT, 1); 
+	curl_setopt($timesRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
+
+	$timesjson = curl_exec($timesRequest);
+	curl_close($timesRequest);	
+	
 	$timesresults = json_decode($timesjson);
 	
 	if ($timesresults->hasError)

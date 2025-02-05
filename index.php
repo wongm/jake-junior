@@ -130,6 +130,7 @@ function drawStopData($stopid, $routeid)
 		
 		// Keep track of different routes
 		$serviceroute = $tramservice->HeadBoardRouteNo;
+		$routeno = $tramservice->RouteNo;
 		$newroute = ($lastroute != $serviceroute);
 		
 		// We only want links when more than one route passes this stop
@@ -139,15 +140,15 @@ function drawStopData($stopid, $routeid)
 		}
 		$lastroute = $serviceroute;
 		
-		array_push($servicesdata, array('newroute' => $newroute, 'serviceroute' => $serviceroute , 'minutesmessage' => $minutesmessage ));
+		array_push($servicesdata, array('newroute' => $newroute, 'routeno' => $routeno , 'serviceroute' => $serviceroute , 'minutesmessage' => $minutesmessage ));
 	}
 	
 	foreach($servicesdata as $tramservice)
 	{		
-		$routetitle = "Route " . $tramservice['serviceroute'];		
+		$routetitle = "Route " . $tramservice['serviceroute'];
 		if ($includelinks && $tramservice['newroute'])
 		{
-			$routetitle = "<a href=\"?id=" . $stopid . "&route=" . $tramservice['serviceroute'] . "\">$routetitle</a>";
+			$routetitle = "<a href=\"?id=" . $stopid . "&route=" . $tramservice['routeno'] . "\">$routetitle</a>";
 		}
 ?>
 <li><?php echo $routetitle ?>: <?php echo $tramservice['minutesmessage'] ?></li>

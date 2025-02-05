@@ -70,35 +70,7 @@ function drawStopData($stopid, $routeid)
 		drawErrorLink('stop ID');
 		return;
 	}
-	
-	if ($routeid == 0)
-	{
-		// get list of routes passing
-		$routesurl = $proxyUrl . "https://tramtracker.com.au/Controllers/GetPassingRoutes.ashx?s=$stopid";
-		$routesRequest = curl_init($routesurl);
-		curl_setopt($routesRequest, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($routesRequest, CURLOPT_HEADER, 0);
-		curl_setopt($routesRequest, CURLOPT_CONNECTTIMEOUT, 1); 
-		curl_setopt($routesRequest, CURLOPT_TIMEOUT, 10); //timeout in seconds
 
-		$routesjson = curl_exec($routesRequest);
-		curl_close($routesRequest);	
-		
-		$routesresults = json_decode($routesjson);	
-		
-		if (sizeof($routesresults->ResponseObject) == 1)
-		{
-			$routeid = $routesresults->ResponseObject[0]->RouteNo;
-		}
-		else
-		{
-			foreach ($routesresults->ResponseObject as $routesresult)
-			{
-				echo "<p><a href=\"?id=" . $stopid . "&route=" . $routesresult->RouteNo . "\">Route " . $routesresult->RouteNo . "</a></p>";
-			}
-			return;
-		}
-	}
 	$timesurl = $proxyUrl . "https://tramtracker.com.au/Controllers/GetNextPredictionsForStop.ashx?stopNo=$stopid%26routeNo=$routeid%26isLowFloor=false%26ts=$timestamp";
 	
 	$timesRequest = curl_init($timesurl);
@@ -130,6 +102,8 @@ function drawStopData($stopid, $routeid)
 <?php
 
 	$servicesdata = array();
+	$includelinks = false;
+	$lastroute = -1;
 
 	foreach($timesresults->responseObject as $tramservice)
 	{
@@ -154,13 +128,27 @@ function drawStopData($stopid, $routeid)
 			$minutesmessage = "$minutesuntil minutes";
 		}
 		
+		// Keep track of different routes
 		$serviceroute = $tramservice->HeadBoardRouteNo;
-		array_push($servicesdata, array('serviceroute' => $serviceroute , 'minutesmessage' => $minutesmessage ));
+		$newroute = ($lastroute != $serviceroute);
+		
+		// We only want links when more than one route passes this stop
+		if ($newroute && $lastroute > 0)
+		{
+			$includelinks = true;
+		}
+		$lastroute = $serviceroute;
+		
+		array_push($servicesdata, array('newroute' => $newroute, 'serviceroute' => $serviceroute , 'minutesmessage' => $minutesmessage ));
 	}
 	
 	foreach($servicesdata as $tramservice)
-	{
-		$routetitle = "Route " . $tramservice['serviceroute'];
+	{		
+		$routetitle = "Route " . $tramservice['serviceroute'];		
+		if ($includelinks && $tramservice['newroute'])
+		{
+			$routetitle = "<a href=\"?id=" . $stopid . "&route=" . $tramservice['serviceroute'] . "\">$routetitle</a>";
+		}
 ?>
 <li><?php echo $routetitle ?>: <?php echo $tramservice['minutesmessage'] ?></li>
 <?php
